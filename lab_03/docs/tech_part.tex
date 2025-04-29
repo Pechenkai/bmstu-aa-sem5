@@ -1,0 +1,99 @@
+\clearpage
+
+
+\chapter{Технологическая часть}\label{ch:-2}
+
+В этом разделе обоснованы средства реализации, а так же представлены реализации алгоритмов и функциональные тесты.
+
+
+\section{Средства реализации}\label{sec:-2}
+
+Для реализации алгоритмов в этой лабораторной работы был выбран язык $Python^{[1]}$ по следующим причинам:
+\begin{itemize}
+    \item python предоставляет необходимые структуры данных, такие как списки (массивы);
+    \item поддерживаемые библиотеки, такие как matplotlib позволяют визуализировать результаты исследования.
+\end{itemize}
+
+\clearpage
+
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{lst:lsearch} --- \ref{lst:bsearch} представлены реализации алгоритмов.
+
+\begin{lstlisting}[style=python, label=lst:lsearch,caption=Алгоритм использующий полный перебор]
+def search_linear(arr, elem):
+    length = len(arr)
+
+    if length == 0:
+        return -1, 0
+
+    cmp = 0
+
+    for i in range(length):
+        cmp += 1
+
+        if arr[i] == elem:
+            return i, cmp
+
+    return -1, cmp
+\end{lstlisting}
+%\clearpage
+
+
+\begin{lstlisting}[style=python, label=lst:bsearch,caption=Алгоритм использующий бинарный поиск]
+def search_binary(arr, elem):
+    length = len(arr)
+
+    if length == 0:
+        return -1, 0
+
+    cmp = 0
+    left = 0
+    right = len(arr) - 1
+    while left <= right:
+        cmp += 1
+        mid = (left + right) // 2
+
+        if arr[mid] == elem:
+            return mid, cmp
+        elif arr[mid] < elem:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return -1, cmp
+
+\end{lstlisting}
+\clearpage
+
+
+\section{Функциональные тесты}
+В таблице \ref{tbl:func_test} приведены функциональные тесты, на которых тестировалась программа.
+\begin{table}[h]
+    \begin{center}
+        \caption{\label{tbl:func_test} Функциональные тесты, на которых были протестированы алгоритмы (в результате -- индекс элемента).}
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            Массив & Искомый элемент & Линейный поиск & Бинарный поиск
+            \\ \hline
+            [ 1, 2, 3, 4, 5 ] & 1 & 0 & 0
+            \\ \hline
+            [ 1, 2, 3, 4, 5 ] & 5 & 4 & 4
+            \\ \hline
+            [ 1, 2, 3, 4, 5 ] & 3 & 2 & 2
+            \\ \hline
+            [] & 3 & -1 & -1
+            \\ \hline
+            [ 1, 2, 3, 4, 5 ] & 6 & -1 & -1
+            \\ \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\section*{Вывод}
+
+В технологической части были представлены листинги реализованных алгоритмов, включая линейный и бинарный поиск по массиву.
+Также были проведены функциональные тесты, которые подтвердили корректность работы алгоритмов на различных входных данных, включая граничные случаи.
+Результаты тестов показали, что разработанные реализации соответствуют поставленным требованиям.
+

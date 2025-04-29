@@ -1,0 +1,29 @@
+\include{(1)preambula}
+
+\begin{document}
+    \include{(2)title}
+
+    \setcounter{page}{3}
+
+    \vspace*{-3cm}
+    \renewcommand\contentsname{
+        \ssr{СОДЕРЖАНИЕ}
+    }
+    \tableofcontents
+
+    \setcounter{page}{2}
+
+    \include{(3)intro}
+    \include{(4)analytic_part}
+    \include{(5)design_part}
+    \include{(6)tech_part}
+    \include{(7)experimental_part}
+    \include{(8)conclusion}
+
+    \def\bibname{\begin{center}
+                     \Large СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ
+    \end{center}}
+    \include{(9)links}
+%
+%	\include{additions}
+\end{document}

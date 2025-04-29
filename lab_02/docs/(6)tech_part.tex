@@ -1,0 +1,248 @@
+\clearpage
+
+
+\chapter{Технологическая часть}\label{ch:-2}
+
+В этом разделе обоснованы средства реализации, а так же представлены реализации алгоритмов и функциональные тесты.
+
+
+\section{Средства реализации}\label{sec:-2}
+
+Для реализации алгоритмов в этой лабораторной работы был выбран язык $Python^{[1]}$ по следующим причинам:
+\begin{itemize}
+    \item python предоставляет необходимые структуры данных, такие как списки (массивы) и вложенные списки (матрицы);
+    \item поддерживаемые библиотеки, такие как $matplotlib{[2]}$ позволяют визуализировать результаты исследования.
+\end{itemize}
+
+\clearpage
+
+
+\section{Реализация алгоритмов}
+
+В листингах~\ref{lst:std} ---~\ref{lst:optwyn} представлены реализации алгоритмов.
+
+\begin{lstlisting}[style=python, label=lst:std,caption=Стандартный алгоритм умножения матриц]
+def standard_multiply(a, b):
+    rows_a = len(a)
+    rows_b = len(b)
+
+    if rows_a == 0 or rows_b == 0:
+        return None
+
+    cols_a = len(a[0])
+    cols_b = len(b[0])
+
+    if cols_a != rows_b or cols_a == 0 or cols_b == 0:
+        return None
+
+    c = [[0] * cols_b for _ in range(rows_a)]
+
+    for i in range(rows_a):
+        for j in range(cols_b):
+            for k in range(cols_a):
+                c[i][j] += a[i][k] * b[k][j]
+
+    return c
+\end{lstlisting}
+\clearpage
+
+
+\begin{lstlisting}[style=python, label=lst:wyn,caption=Алгоритм Винограда]
+def winograd_multiply(a, b):
+    rows_a = len(a)
+    rows_b = len(b)
+
+    if rows_a == 0 or rows_b == 0:
+        return None
+
+    cols_a = len(a[0])
+    cols_b = len(b[0])
+
+    if cols_a != rows_b or cols_a == 0 or cols_b == 0:
+        return None
+
+    c = [[0] * cols_b for _ in range(rows_a)]
+
+    row_factor = [0] * rows_a
+    col_factor = [0] * cols_b
+
+    for i in range(rows_a):
+        for j in range(cols_a // 2):
+            row_factor[i] += a[i][2 * j] * a[i][2 * j + 1]
+
+    for i in range(cols_b):
+        for j in range(rows_b // 2):
+            col_factor[i] += b[2 * j][i] * b[2 * j + 1][i]
+
+    for i in range(rows_a):
+        for j in range(cols_b):
+            c[i][j] += -row_factor[i] - col_factor[j]
+
+            for k in range(cols_a // 2):
+                c[i][j] += (a[i][2 * k] + b[2 * k + 1][j]) * (a[i][2 * k + 1] + b[2 * k][j])
+
+    if cols_a % 2 != 0:
+        for i in range(rows_a):
+            for j in range(cols_b):
+                c[i][j] += a[i][cols_a - 1] * b[rows_b - 1][j]
+
+    return c
+\end{lstlisting}
+
+\clearpage
+
+\begin{lstlisting}[style=python, label=lst:optwyn,caption=Оптимизированный алгоритм Винограда]
+def optimized_winograd_multiply(a, b):
+    rows_a = len(a)
+    rows_b = len(b)
+
+    if rows_a == 0 or rows_b == 0:
+        return None
+
+    cols_a = len(a[0])
+    cols_b = len(b[0])
+
+    if cols_a != rows_b or cols_a == 0 or cols_b == 0:
+        return None
+
+    c = [[0] * cols_b for _ in range(rows_a)]
+
+    row_factor = [0] * rows_a
+    col_factor = [0] * cols_b
+
+    for i in range(rows_a):
+        j = cols_a // 2 - 1
+        while j >= 0:
+            row_factor[i] += a[i][j << 1] * a[i][(j << 1) + 1]
+            j -= 1
+
+    for i in range(cols_b):
+        j = rows_b // 2 - 1
+        while j >= 0:
+            col_factor[i] += b[j << 1][i] * b[(j << 1) + 1][i]
+            j -= 1
+
+    for i in range(rows_a):
+        for j in range(cols_b):
+            c[i][j] += -row_factor[i] - col_factor[j]
+
+            for k in range(cols_a // 2):
+                c[i][j] += (a[i][k << 1] + b[(k << 1) + 1][j]) * (a[i][(k << 1) + 1] + b[k << 1][j])
+
+            if cols_a % 2 != 0:
+                c[i][j] += a[i][cols_a - 1] * b[rows_b - 1][j]
+
+    return c
+\end{lstlisting}
+
+\clearpage
+
+
+\section{Функциональные тесты}
+В таблице~\ref{tbl:func_test} приведены функциональные тесты, на которых тестировалась программа.
+\begin{table}[h]
+    \begin{center}
+        \caption{\label{tbl:func_test} Функциональные тесты, на которых были протестированы алгоритмы (в результате -- матрица c).}
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            Матрица a & Матрица b & Результат
+            \\ \hline
+            $\begin{pmatrix}
+                 1 & 2 \\
+                 3 & 4
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 5 & 6 \\
+                 7 & 8
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 19 & 22 \\
+                 43 & 50
+            \end{pmatrix}$
+            \\ \hline
+            $\begin{pmatrix}
+                 1 & 2 & 3 \\
+                 4 & 5 & 6
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 7  & 8  \\
+                 9  & 10 \\
+                 11 & 12
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 58  & 64  \\
+                 139 & 154
+            \end{pmatrix}$
+            \\ \hline
+            $\begin{pmatrix}
+                 1 & 2 & 3
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 4 \\
+                 5 \\
+                 6
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 32
+            \end{pmatrix}$ \\
+            \hline
+            $\begin{pmatrix}
+                 1 & 2 & 3 \\
+                 4 & 5 & 6 \\
+                 7 & 8 & 9
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 9 & 8 & 7 \\
+                 6 & 5 & 4 \\
+                 3 & 2 & 1
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 30  & 24  & 18 \\
+                 89  & 69  & 54 \\
+                 138 & 114 & 90
+            \end{pmatrix}$ \\
+            \hline
+            $\begin{pmatrix}
+                 1 & 0 & 0 \\
+                 0 & 1 & 0 \\
+                 0 & 0 & 1
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 5  & 6  & 7  \\
+                 8  & 9  & 10 \\
+                 11 & 12 & 13
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 5  & 6  & 7  \\
+                 8  & 9  & 10 \\
+                 11 & 12 & 13
+            \end{pmatrix}$ \\
+            \hline
+            $\begin{pmatrix}
+                 \\
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 \\
+            \end{pmatrix}$ &
+            \text{Ошибка} \\
+            \hline
+            $\begin{pmatrix}
+                 1 & 2 \\
+                 3 & 4
+            \end{pmatrix}$ &
+            $\begin{pmatrix}
+                 5 & 6 & 7
+            \end{pmatrix}$ &
+            \text{Ошибка} \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\section*{Вывод}
+
+В технологической части были представлены листинги реализованных алгоритмов, включая стандартный алгоритм умножения матриц,
+а также алгоритм Винограда и оптимизированный алгоритм Винограда.
+Также были проведены функциональные тесты, которые подтвердили корректность работы алгоритмов на различных входных данных, включая граничные случаи.
+Результаты тестов показали, что разработанные реализации соответствуют поставленным требованиям.
+

@@ -1,0 +1,17 @@
+\documentclass{bmstu}
+\include{(1)preamble}
+
+\addbibresource{(4)biblio.bib}
+
+\begin{document}
+
+    \include{(2)title}
+    \maketableofcontents
+    \include{(3)content}
+
+    \clearpage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}
+    \printbibliography[title=СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ]
+
+\end{document}
